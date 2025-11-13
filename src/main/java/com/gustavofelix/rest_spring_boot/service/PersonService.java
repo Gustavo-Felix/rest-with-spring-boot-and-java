@@ -36,10 +36,10 @@ public class PersonService {
         return personRepository.save(person);
     }
 
-    public Person update(Person person) {
+    public Person update(Long id, Person person) {
         logger.info("Updating a Person!");
 
-        Person entity = personRepository.findById(person.getId())
+        Person entity = personRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
 
         updateEntity(entity, person);

@@ -47,9 +47,9 @@ public class PersonController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Person> update(@RequestBody Person person) {
-        personService.update(person);
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Person> update(@PathVariable Long id, @RequestBody Person person) {
+        personService.update(id, person);
         return ResponseEntity.noContent().build();
     }
 
