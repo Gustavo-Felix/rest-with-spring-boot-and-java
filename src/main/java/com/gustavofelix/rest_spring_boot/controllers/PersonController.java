@@ -1,7 +1,6 @@
 package com.gustavofelix.rest_spring_boot.controllers;
 
-import com.gustavofelix.rest_spring_boot.dto.v1.PersonDTOV1;
-import com.gustavofelix.rest_spring_boot.dto.v2.PersonDTOV2;
+import com.gustavofelix.rest_spring_boot.dto.PersonDTO;
 import com.gustavofelix.rest_spring_boot.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -13,42 +12,29 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/person")
+@RequestMapping(value = "api/v1/person")
 public class PersonController {
 
     @Autowired
     private PersonService personService;
 
-    @GetMapping(value = "/v1", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<PersonDTOV1>> findAll() {
-        List<PersonDTOV1> persons = personService.findAll();
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<PersonDTO>> findAll() {
+        List<PersonDTO> persons = personService.findAll();
 
         return ResponseEntity.ok().body(persons);
     }
 
-    @GetMapping(value = "/v1/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonDTOV1> findById(@PathVariable Long id) {
-        PersonDTOV1 person = personService.findById(id);
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDTO> findById(@PathVariable Long id) {
+        PersonDTO person = personService.findById(id);
 
         return ResponseEntity.ok().body(person);
     }
 
-    @PostMapping(value = "/v1", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonDTOV1> insert(@RequestBody PersonDTOV1 person) {
-        PersonDTOV1 createdPersonDTOV1 = personService.insert(person);
-
-        URI location = ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{id}")
-                .buildAndExpand(createdPersonDTOV1.getId())
-                .toUri();
-
-        return ResponseEntity.created(location).build();
-    }
-
-    @PostMapping(value = "/v2", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonDTOV2> insert(@RequestBody PersonDTOV2 person) {
-        PersonDTOV2 createdPersonDTO = personService.insertV2(person);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDTO> insert(@RequestBody PersonDTO person) {
+        PersonDTO createdPersonDTO = personService.insert(person);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -59,13 +45,13 @@ public class PersonController {
         return ResponseEntity.created(location).build();
     }
 
-    @PutMapping(value = "/v1/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PersonDTOV1> update(@PathVariable Long id, @RequestBody PersonDTOV1 person) {
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PersonDTO> update(@PathVariable Long id, @RequestBody PersonDTO person) {
         personService.update(id, person);
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping(value = "/v1/{id}")
+    @DeleteMapping(value = "/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         personService.delete(id);
         return ResponseEntity.noContent().build();
