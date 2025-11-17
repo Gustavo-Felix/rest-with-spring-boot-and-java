@@ -1,11 +1,9 @@
-package com.gustavofelix.rest_spring_boot.dto;
-
-import jakarta.persistence.*;
+package com.gustavofelix.rest_spring_boot.dto.v1;
 
 import java.io.Serializable;
 import java.util.Objects;
 
-public class PersonDTO implements Serializable {
+public class PersonDTOV1 implements Serializable {
 
     private static final long serialVersionID = 1L;
 
@@ -15,10 +13,10 @@ public class PersonDTO implements Serializable {
     private String address;
     private String gender;
 
-    public PersonDTO() {
+    public PersonDTOV1() {
     }
 
-    public PersonDTO(Long id, String firstName, String lastName, String address, String gender) {
+    public PersonDTOV1(Long id, String firstName, String lastName, String address, String gender) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -69,7 +67,7 @@ public class PersonDTO implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        PersonDTO person = (PersonDTO) o;
+        PersonDTOV1 person = (PersonDTOV1) o;
         return Objects.equals(id, person.id);
     }
 
