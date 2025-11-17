@@ -3,12 +3,12 @@ package com.gustavofelix.rest_spring_boot.service;
 import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
 import com.gustavofelix.rest_spring_boot.model.Person;
 import com.gustavofelix.rest_spring_boot.repository.PersonRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.logging.Logger;
 
 @Service
 public class PersonService {
@@ -16,7 +16,7 @@ public class PersonService {
     @Autowired
     private PersonRepository personRepository;
 
-    private Logger logger = Logger.getLogger(PersonService.class.getName());
+    private Logger logger = LoggerFactory.getLogger(PersonService.class.getName());
 
     public List<Person> findAll() {
         logger.info("Finding Persons!");
