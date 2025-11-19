@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -28,7 +29,9 @@ public class PersonController {
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PersonDTO> findById(@PathVariable Long id) {
         PersonDTO person = personService.findById(id);
-
+        person.setPhoneNumber("+55 (11) 11111-1111");
+        person.setBirthDay(new Date());
+        person.setSensitiveData("Sensitive Data!!!!");
         return ResponseEntity.ok().body(person);
     }
 
