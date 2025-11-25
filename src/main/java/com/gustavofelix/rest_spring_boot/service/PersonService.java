@@ -2,6 +2,7 @@ package com.gustavofelix.rest_spring_boot.service;
 
 import com.gustavofelix.rest_spring_boot.controllers.PersonController;
 import com.gustavofelix.rest_spring_boot.dto.PersonDTO;
+import com.gustavofelix.rest_spring_boot.exception.ResourceBadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
 import com.gustavofelix.rest_spring_boot.model.Person;
 import com.gustavofelix.rest_spring_boot.repository.PersonRepository;
@@ -45,6 +46,9 @@ public class PersonService {
     }
 
     public PersonDTO insert(PersonDTO person) {
+
+        if (person == null) throw new ResourceBadRequestException();
+
         logger.info("Creating a Person!");
         var entity = parseObject(person, Person.class);
 
