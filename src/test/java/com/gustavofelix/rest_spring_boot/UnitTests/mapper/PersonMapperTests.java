@@ -12,7 +12,7 @@ import static com.gustavofelix.rest_spring_boot.mapper.ObjectMapper.parseListObj
 import static com.gustavofelix.rest_spring_boot.mapper.ObjectMapper.parseObject;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class ObjectMapperTests {
+public class PersonMapperTests {
     MockPerson inputObject;
 
     @BeforeEach
