@@ -14,6 +14,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
+//@CrossOrigin(origins = "http://localhost:8080")
 @RestController
 @RequestMapping(value = "api/person/v1")
 @Tag(name = "People", description = "EndPoints for managing people!")
@@ -34,6 +35,7 @@ public class PersonController implements PersonControllerDocs {
         return ResponseEntity.ok().body(persons);
     }
 
+    // @CrossOrigin(origins = "http://localhost:8080")
     @GetMapping(value = "/{id}", produces = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE,
@@ -45,6 +47,7 @@ public class PersonController implements PersonControllerDocs {
         return ResponseEntity.ok().body(person);
     }
 
+    // @CrossOrigin(origins = {"http://localhost:8080", "http://otherhost.com"})
     @PostMapping(consumes = {
             MediaType.APPLICATION_JSON_VALUE,
             MediaType.APPLICATION_XML_VALUE,
@@ -64,7 +67,7 @@ public class PersonController implements PersonControllerDocs {
                 .buildAndExpand(createdPersonDTO.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(createdPersonDTO);
     }
 
     @PutMapping(value = "/{id}", consumes = {
