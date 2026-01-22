@@ -41,6 +41,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
         person.setLastName("Camargo");
         person.setAddress("Sorocaba - São Paulo - BR");
         person.setGender("Male");
+        person.setEnabled(true);
     }
 
     @Test
@@ -149,6 +150,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
         assertEquals("Camargo", createdPerson.getLastName());
         assertEquals("SP", createdPerson.getAddress());
         assertEquals("Male", createdPerson.getGender());
+        assertEquals(true, createdPerson.getEnabled());
 
     }
 

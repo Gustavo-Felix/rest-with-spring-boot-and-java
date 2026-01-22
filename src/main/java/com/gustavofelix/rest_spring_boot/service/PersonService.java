@@ -6,6 +6,7 @@ import com.gustavofelix.rest_spring_boot.exception.ResourceBadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
 import com.gustavofelix.rest_spring_boot.model.Person;
 import com.gustavofelix.rest_spring_boot.repository.PersonRepository;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +71,22 @@ public class PersonService {
         return dto;
     }
 
+    @Transactional
+    public PersonDTO disablePerson(Long id) {
+        logger.info("Disabling a Person!");
+
+        personRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Person not found!"));
+
+        personRepository.disablePerson(id);
+
+        var entity = personRepository.findById(id).get();
+        var dto = parseObject(entity, PersonDTO.class);
+        addHateoasLinks(dto);
+
+        return dto;
+    }
+
     public void delete(Long id) {
         logger.info("Deleting a Person!");
 
@@ -91,6 +108,7 @@ public class PersonService {
         dto.add(linkTo(methodOn(PersonController.class).findAll()).withRel("findAll").withType("GET"));
         dto.add(linkTo(methodOn(PersonController.class).insert(dto)).withRel("insert").withType("POST"));
         dto.add(linkTo(methodOn(PersonController.class).update(dto.getId(), dto)).withRel("update").withType("PUT"));
+        dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
         dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
     }
 }

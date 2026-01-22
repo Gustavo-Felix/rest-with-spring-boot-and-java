@@ -8,23 +8,14 @@ import java.util.Objects;
 
 public class PersonDTO extends RepresentationModel<PersonDTO> implements Serializable {
 
-    private static final long serialVersionID = 1L;
-
     private Long id;
     private String firstName;
     private String lastName;
     private String address;
     private String gender;
+    private Boolean enabled;
 
     public PersonDTO() {
-    }
-
-    public PersonDTO(Long id, String firstName, String lastName, String phoneNumber, Date birthDay, String address, String gender) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.address = address;
-        this.gender = gender;
     }
 
     public Long getId() {
@@ -65,6 +56,14 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public Boolean getEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @Override
