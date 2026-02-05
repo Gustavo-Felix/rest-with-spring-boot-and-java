@@ -155,13 +155,10 @@ class BookServiceTest {
 
     @Test
     void insert() {
-        Book book = input.mockEntity(1);
-        Book persisted = book;
-        persisted.setId(1L);
-
+        Book entity = input.mockEntity(1);
         BookDTO dto = input.mockDTO(1);
 
-        when(bookRepository.save(book)).thenReturn(persisted);
+        when(bookRepository.save(any(Book.class))).thenReturn(entity);
         var result = bookService.insert(dto);
 
         assertNotNull(result);
@@ -198,9 +195,9 @@ class BookServiceTest {
                         && link.getHref().endsWith("/api/v1/book/1")
                         && link.getType().equals("DELETE"));
 
-        assertEquals("Author Test1", book.getAuthor());
-        assertEquals(Instant.parse("2025-11-28T20:31:10Z"), book.getLaunchDate());
-        assertEquals("Title Test1", book.getTitle());
+        assertEquals("Author Test1", entity.getAuthor());
+        assertEquals(Instant.parse("2025-11-28T20:31:10Z"), entity.getLaunchDate());
+        assertEquals("Title Test1", entity.getTitle());
     }
 
     @Test

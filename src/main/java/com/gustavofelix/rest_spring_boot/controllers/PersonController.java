@@ -81,8 +81,8 @@ public class PersonController implements PersonControllerDocs {
     )
     @Override
     public ResponseEntity<PersonDTO> update(@PathVariable Long id, @RequestBody PersonDTO person) {
-        personService.update(id, person);
-        return ResponseEntity.noContent().build();
+        var updatedPerson = personService.update(id, person);
+        return ResponseEntity.ok().body(updatedPerson);
     }
 
     @PatchMapping(value = "/{id}", produces = {

@@ -1,5 +1,8 @@
-package com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.withjson;
+package com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.cors.withxml;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.PersonDTO;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.testcontainers.AbstractIntegrationTest;
 import com.gustavofelix.rest_spring_boot.config.TestConfigs;
@@ -11,8 +14,6 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.DeserializationFeature;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
@@ -21,16 +22,16 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class PersonControllerTest extends AbstractIntegrationTest {
+class PersonControllerXmlCorsTest extends AbstractIntegrationTest {
 
     private static RequestSpecification specification;
-    private static ObjectMapper objectMapper;
+    private static XmlMapper objectMapper;
 
     private static PersonDTO person;
 
     @BeforeAll
     static void setUp() {
-        objectMapper = new ObjectMapper();
+        objectMapper = new XmlMapper();
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         person = new PersonDTO();
@@ -51,6 +52,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
 
         specification = new RequestSpecBuilder()
                 .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+                .addHeader("Accept", MediaType.APPLICATION_XML_VALUE)
                 .setBasePath("/api/person/v1")
                 .setPort(TestConfigs.SERVER_PORT)
                     .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -58,7 +60,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .build();
 
         var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                     .body(person)
                 .when()
                     .post()
@@ -97,7 +99,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .build();
 
         var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                     .body(person)
                 .when()
                     .post()
@@ -117,6 +119,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
 
         specification = new RequestSpecBuilder()
                 .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_LOCAL)
+                .addHeader("Accept", MediaType.APPLICATION_XML_VALUE)
                 .setBasePath("/api/person/v1")
                 .setPort(TestConfigs.SERVER_PORT)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -124,7 +127,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .build();
 
         var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                 .pathParam("id", person.getId())
                 .when()
                     .get("{id}")
@@ -156,9 +159,10 @@ class PersonControllerTest extends AbstractIntegrationTest {
 
     @Test
     @Order(4)
-    void findByIdWithWrongOrigin() {
+    void findByIdWithWrongOrigin() throws JsonProcessingException {
         specification = new RequestSpecBuilder()
                 .addHeader(TestConfigs.HEADER_PARAM_ORIGIN, TestConfigs.ORIGIN_TEST)
+                .addHeader("Accept", MediaType.APPLICATION_XML_VALUE)
                 .setBasePath("/api/person/v1")
                 .setPort(TestConfigs.SERVER_PORT)
                 .addFilter(new RequestLoggingFilter(LogDetail.ALL))
@@ -166,7 +170,7 @@ class PersonControllerTest extends AbstractIntegrationTest {
                 .build();
 
         var content = given(specification)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .contentType(MediaType.APPLICATION_XML_VALUE)
                     .pathParam("id", person.getId())
                 .when()
                     .get("{id}")

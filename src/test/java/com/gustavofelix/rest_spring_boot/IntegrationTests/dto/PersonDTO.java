@@ -1,9 +1,12 @@
 package com.gustavofelix.rest_spring_boot.IntegrationTests.dto;
 
+import jakarta.xml.bind.annotation.XmlRootElement;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Objects;
 
+@XmlRootElement
 public class PersonDTO implements Serializable {
 
     private Long id;
