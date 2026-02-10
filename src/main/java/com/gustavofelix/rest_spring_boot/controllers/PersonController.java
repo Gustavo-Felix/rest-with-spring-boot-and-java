@@ -6,6 +6,10 @@ import com.gustavofelix.rest_spring_boot.serialization.converter.YamlJackson2Htt
 import com.gustavofelix.rest_spring_boot.service.PersonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,10 +33,16 @@ public class PersonController implements PersonControllerDocs {
             YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML}
     )
     @Override
-    public ResponseEntity<List<PersonDTO>> findAll() {
-        List<PersonDTO> persons = personService.findAll();
+    public ResponseEntity<Page<PersonDTO>> findAll(
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "12") Integer size,
+            @RequestParam(value = "direction", defaultValue = "asc") String direction
+    ) {
+        var sortDirection = "desc".equalsIgnoreCase(direction) ? Sort.Direction.DESC : Sort.Direction.ASC;
 
-        return ResponseEntity.ok().body(persons);
+        Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "firstName"));
+
+        return ResponseEntity.ok().body(personService.findAll(pageable));
     }
 
     // @CrossOrigin(origins = "http://localhost:8080")
