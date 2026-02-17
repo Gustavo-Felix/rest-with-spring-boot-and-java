@@ -1,6 +1,7 @@
 package com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.withjson;
 
 import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.PersonDTO;
+import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.wrappers.json.person.WrapperPersonDTO;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.testcontainers.AbstractIntegrationTest;
 import com.gustavofelix.rest_spring_boot.config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
@@ -11,10 +12,9 @@ import io.restassured.specification.RequestSpecification;
 import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.JsonProcessingException;
-import org.testcontainers.shaded.com.fasterxml.jackson.core.type.TypeReference;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.DeserializationFeature;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.List;
 
@@ -194,6 +194,7 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
 
         var content = given(specification)
                 .accept(MediaType.APPLICATION_JSON_VALUE)
+                .queryParam("page", 1, "size", 12, "direction", "ASC")
                 .when()
                     .get()
                 .then()
@@ -203,7 +204,8 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
                     .body()
                         .asString();
 
-        List<PersonDTO> people = objectMapper.readValue(content, new TypeReference<List<PersonDTO>>() {});
+        WrapperPersonDTO wrapper = objectMapper.readValue(content, WrapperPersonDTO.class);
+        List<PersonDTO> people = wrapper.getEmbedded().getPeople();
         PersonDTO personOne = people.getFirst();
         PersonDTO personTwo = people.get(1);
         person = people.getFirst();
@@ -211,20 +213,20 @@ class PersonControllerJsonTest extends AbstractIntegrationTest {
         assertNotNull(personOne.getId());
         assertTrue(personOne.getId() > 0);
 
-        assertEquals("Gustavo", personOne.getFirstName());
-        assertEquals("Camargo", personOne.getLastName());
-        assertEquals("SP", personOne.getAddress());
-        assertEquals("Male", personOne.getGender());
+        assertEquals("Agace", personOne.getFirstName());
+        assertEquals("Bredbury", personOne.getLastName());
+        assertEquals("Apt 1298", personOne.getAddress());
+        assertEquals("Female", personOne.getGender());
         assertTrue(personOne.getEnabled());
 
         assertNotNull(personTwo.getId());
         assertTrue(personTwo.getId() > 0);
 
-        assertEquals("Bruna", personTwo.getFirstName());
-        assertEquals("Camargo", personTwo.getLastName());
-        assertEquals("SP", personTwo.getAddress());
+        assertEquals("Agatha", personTwo.getFirstName());
+        assertEquals("Menendez", personTwo.getLastName());
+        assertEquals("Suite 68", personTwo.getAddress());
         assertEquals("Female", personTwo.getGender());
-        assertTrue(personTwo.getEnabled());
+        assertFalse(personTwo.getEnabled());
 
     }
 }

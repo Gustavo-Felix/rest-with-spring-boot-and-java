@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.PersonDTO;
+import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.wrappers.xml.PagedModelPerson;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.testcontainers.AbstractIntegrationTest;
 import com.gustavofelix.rest_spring_boot.config.TestConfigs;
 import io.restassured.builder.RequestSpecBuilder;
@@ -192,21 +193,19 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
     void findAllTest() throws JsonProcessingException {
 
         var content = given(specification)
+                .accept(MediaType.APPLICATION_XML_VALUE)
+                .queryParam("page", 1, "size", 12, "direction", "ASC")
                 .when()
-                    .get()
+                .get()
                 .then()
-                    .statusCode(200)
+                .statusCode(200)
                 .contentType(MediaType.APPLICATION_XML_VALUE)
                 .extract()
-                    .body()
-                        .asString();
+                .body()
+                .asString();
 
-        List<PersonDTO> people = objectMapper.readValue(
-                content,
-                objectMapper.getTypeFactory()
-                        .constructCollectionType(List.class, PersonDTO.class)
-        );
-
+        PagedModelPerson wrapper = objectMapper.readValue(content, PagedModelPerson.class);
+        List<PersonDTO> people = wrapper.getContent();
         PersonDTO personOne = people.getFirst();
         PersonDTO personTwo = people.get(1);
         person = people.getFirst();
@@ -214,19 +213,19 @@ class PersonControllerXmlTest extends AbstractIntegrationTest {
         assertNotNull(personOne.getId());
         assertTrue(personOne.getId() > 0);
 
-        assertEquals("Gustavo", personOne.getFirstName());
-        assertEquals("Camargo", personOne.getLastName());
-        assertEquals("SP", personOne.getAddress());
-        assertEquals("Male", personOne.getGender());
+        assertEquals("Agace", personOne.getFirstName());
+        assertEquals("Bredbury", personOne.getLastName());
+        assertEquals("Apt 1298", personOne.getAddress());
+        assertEquals("Female", personOne.getGender());
         assertTrue(personOne.getEnabled());
 
         assertNotNull(personTwo.getId());
         assertTrue(personTwo.getId() > 0);
 
-        assertEquals("Bruna", personTwo.getFirstName());
-        assertEquals("Camargo", personTwo.getLastName());
-        assertEquals("SP", personTwo.getAddress());
+        assertEquals("Agatha", personTwo.getFirstName());
+        assertEquals("Menendez", personTwo.getLastName());
+        assertEquals("Suite 68", personTwo.getAddress());
         assertEquals("Female", personTwo.getGender());
-        assertTrue(personTwo.getEnabled());
+        assertFalse(personTwo.getEnabled());
     }
 }

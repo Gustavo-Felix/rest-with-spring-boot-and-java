@@ -1,9 +1,9 @@
 package com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.withyaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+import com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.withyaml.mapper.YAMLMapper;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.PersonDTO;
+import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.wrappers.xml.PagedModelPerson;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.testcontainers.AbstractIntegrationTest;
 import com.gustavofelix.rest_spring_boot.config.TestConfigs;
 import com.gustavofelix.rest_spring_boot.serialization.converter.YamlJackson2HttpMessageConverter;
@@ -35,7 +35,6 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
     @BeforeAll
     static void setUp() {
         objectMapper = new YAMLMapper();
-        objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         RestAssured.config = RestAssured.config()
                 .encoderConfig(
@@ -68,9 +67,9 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
                     .addFilter(new ResponseLoggingFilter(LogDetail.ALL))
                 .build();
 
-        var content = given(specification)
+        var createdPerson = given(specification)
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
-                    .body(objectMapper.writeValueAsString(person))
+                    .body(person, objectMapper)
                 .when()
                     .post()
                 .then()
@@ -78,9 +77,8 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
                 .extract()
                     .body()
-                        .asString();
+                        .as(PersonDTO.class, objectMapper);
 
-        PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -99,10 +97,10 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
     void updateTest() throws JsonProcessingException {
         person.setLastName("Benedict Torvalds");
 
-        var content = given(specification)
+        var createdPerson = given(specification)
                 .contentType("application/x-yaml")
                     .pathParam("id", person.getId())
-                    .body(objectMapper.writeValueAsString(person))
+                    .body(person, objectMapper)
                 .when()
                     .put("{id}")
                 .then()
@@ -110,9 +108,8 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
                 .contentType("application/x-yaml")
                 .extract()
                     .body()
-                        .asString();
+                        .as(PersonDTO.class, objectMapper);
 
-        PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -130,7 +127,7 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
     @Order(3)
     void findByIdTest() throws JsonProcessingException {
 
-        var content = given(specification)
+        var createdPerson = given(specification)
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
                 .pathParam("id", person.getId())
                 .when()
@@ -140,9 +137,8 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
                 .extract()
                 .body()
-                .asString();
+                .as(PersonDTO.class, objectMapper);
 
-        PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -159,7 +155,7 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
     @Order(4)
     void disableTest() throws JsonProcessingException {
 
-        var content = given(specification)
+        var createdPerson = given(specification)
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
                     .pathParam("id", person.getId())
                 .when()
@@ -169,9 +165,8 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
                 .extract()
                     .body()
-                        .asString();
+                        .as(PersonDTO.class, objectMapper);
 
-        PersonDTO createdPerson = objectMapper.readValue(content, PersonDTO.class);
         person = createdPerson;
 
         assertNotNull(createdPerson.getId());
@@ -201,22 +196,19 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
     @Order(6)
     void findAllTest() throws JsonProcessingException {
 
-        var content = given(specification)
+        var response = given(specification)
+                .accept(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
+                .queryParam("page", 1, "size", 12, "direction", "ASC")
                 .when()
-                    .get()
+                .get()
                 .then()
-                    .statusCode(200)
+                .statusCode(200)
                 .contentType(YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML)
                 .extract()
-                    .body()
-                        .asString();
+                .body()
+                .as(PagedModelPerson.class, objectMapper);
 
-        List<PersonDTO> people = objectMapper.readValue(
-                content,
-                objectMapper.getTypeFactory()
-                        .constructCollectionType(List.class, PersonDTO.class)
-        );
-
+        List<PersonDTO> people = response.getContent();
         PersonDTO personOne = people.getFirst();
         PersonDTO personTwo = people.get(1);
         person = people.getFirst();
@@ -224,20 +216,20 @@ class PersonControllerYamlTest extends AbstractIntegrationTest {
         assertNotNull(personOne.getId());
         assertTrue(personOne.getId() > 0);
 
-        assertEquals("Gustavo", personOne.getFirstName());
-        assertEquals("Camargo", personOne.getLastName());
-        assertEquals("SP", personOne.getAddress());
-        assertEquals("Male", personOne.getGender());
+        assertEquals("Agace", personOne.getFirstName());
+        assertEquals("Bredbury", personOne.getLastName());
+        assertEquals("Apt 1298", personOne.getAddress());
+        assertEquals("Female", personOne.getGender());
         assertTrue(personOne.getEnabled());
 
         assertNotNull(personTwo.getId());
         assertTrue(personTwo.getId() > 0);
 
-        assertEquals("Bruna", personTwo.getFirstName());
-        assertEquals("Camargo", personTwo.getLastName());
-        assertEquals("SP", personTwo.getAddress());
+        assertEquals("Agatha", personTwo.getFirstName());
+        assertEquals("Menendez", personTwo.getLastName());
+        assertEquals("Suite 68", personTwo.getAddress());
         assertEquals("Female", personTwo.getGender());
-        assertTrue(personTwo.getEnabled());
+        assertFalse(personTwo.getEnabled());
 
     }
 }

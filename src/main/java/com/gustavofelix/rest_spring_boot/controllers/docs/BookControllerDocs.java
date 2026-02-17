@@ -67,8 +67,8 @@ public interface BookControllerDocs {
             tags = {"Book"},
             responses = {
                     @ApiResponse(
-                            description = "Success",
-                            responseCode = "200",
+                            description = "Created",
+                            responseCode = "201",
                             content = @Content(schema = @Schema(implementation = BookDTO.class)
                             )),
                     @ApiResponse(description = "No Content", responseCode = "204", content = @Content),

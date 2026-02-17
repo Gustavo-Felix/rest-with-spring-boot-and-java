@@ -49,8 +49,8 @@ public class BookController implements BookControllerDocs {
     )
     @Override
     public ResponseEntity<BookDTO> findById(@PathVariable Long id) {
-        BookDTO person = bookService.findById(id);
-        return ResponseEntity.ok().body(person);
+        BookDTO book = bookService.findById(id);
+        return ResponseEntity.ok().body(book);
     }
 
     @PostMapping(consumes = {
@@ -63,8 +63,8 @@ public class BookController implements BookControllerDocs {
                     YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML}
     )
     @Override
-    public ResponseEntity<BookDTO> insert(@RequestBody BookDTO person) {
-        BookDTO createdBookDTO = bookService.insert(person);
+    public ResponseEntity<BookDTO> insert(@RequestBody BookDTO book) {
+        BookDTO createdBookDTO = bookService.insert(book);
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentRequest()
@@ -72,7 +72,7 @@ public class BookController implements BookControllerDocs {
                 .buildAndExpand(createdBookDTO.getId())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(createdBookDTO);
     }
 
     @PutMapping(value = "/{id}", consumes = {
@@ -85,9 +85,9 @@ public class BookController implements BookControllerDocs {
                     YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML}
     )
     @Override
-    public ResponseEntity<BookDTO> update(@PathVariable Long id, @RequestBody BookDTO person) {
-        bookService.update(id, person);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<BookDTO> update(@PathVariable Long id, @RequestBody BookDTO book) {
+        BookDTO bookDTO = bookService.update(id, book);
+        return ResponseEntity.ok().body(bookDTO);
     }
 
     @DeleteMapping(value = "/{id}")

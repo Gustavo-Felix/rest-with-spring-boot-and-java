@@ -1,4 +1,4 @@
-package com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.cors.withyaml.withxml;
+package com.gustavofelix.rest_spring_boot.IntegrationTests.controllers.cors.withyaml;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
