@@ -1,8 +1,6 @@
 package com.gustavofelix.rest_spring_boot.exception.handler;
 
-import com.gustavofelix.rest_spring_boot.exception.ExceptionResponse;
-import com.gustavofelix.rest_spring_boot.exception.ResourceBadRequestException;
-import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
+import com.gustavofelix.rest_spring_boot.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,6 +31,18 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public final ResponseEntity<ExceptionResponse> handleNotFoundExceptions (Exception ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FileNotFoundException.class)
+    public final ResponseEntity<ExceptionResponse> handleFileNotFoundException (Exception ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(FileStorageException.class)
+    public final ResponseEntity<ExceptionResponse> handleFileStorageException (Exception ex, WebRequest request) {
+        ExceptionResponse response = new ExceptionResponse(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
