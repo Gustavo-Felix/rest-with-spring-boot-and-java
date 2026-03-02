@@ -2,10 +2,13 @@ package com.gustavofelix.rest_spring_boot.service;
 
 import com.gustavofelix.rest_spring_boot.config.FileStorageConfig;
 import com.gustavofelix.rest_spring_boot.controllers.FileController;
+import com.gustavofelix.rest_spring_boot.exception.FileNotFoundException;
 import com.gustavofelix.rest_spring_boot.exception.FileStorageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,6 +55,22 @@ public class FileStorageService {
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new FileStorageException("Could not store file " + fileName + ". Please try again!", e);
+        }
+    }
+
+    public Resource loadFileAsResource(String fileName) {
+        try {
+            Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+            if (resource.exists() || resource.isReadable()) {
+                return resource;
+            } else {
+                throw new FileNotFoundException("File not found " + fileName);
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            throw new FileNotFoundException("File not found " + fileName, e);
         }
     }
 
