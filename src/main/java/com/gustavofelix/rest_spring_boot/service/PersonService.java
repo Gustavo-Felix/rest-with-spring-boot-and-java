@@ -6,6 +6,9 @@ import com.gustavofelix.rest_spring_boot.exception.BadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.FileStorageException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceBadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
+import com.gustavofelix.rest_spring_boot.file.exporter.MediaTypes;
+import com.gustavofelix.rest_spring_boot.file.exporter.contract.FileExporter;
+import com.gustavofelix.rest_spring_boot.file.exporter.factory.FileExporterFactory;
 import com.gustavofelix.rest_spring_boot.file.importer.contract.FileImporter;
 import com.gustavofelix.rest_spring_boot.file.importer.factory.FileImporterFactory;
 import com.gustavofelix.rest_spring_boot.model.Person;
@@ -17,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedResourcesAssembler;
@@ -43,6 +47,9 @@ public class PersonService {
 
     @Autowired
     private FileImporterFactory importer;
+
+    @Autowired
+    private FileExporterFactory exporter;
 
     @Autowired
     PagedResourcesAssembler<PersonDTO> assembler;
@@ -74,6 +81,20 @@ public class PersonService {
         var dto = parseObject(entity, PersonDTO.class);
         addHateoasLinks(dto);
         return dto;
+    }
+
+    public Resource exportPage(Pageable pageable, String acceptHeader) {
+        logger.info("Exporting a Person Page!");
+
+        var people = personRepository.findAll(pageable)
+                .map(person -> parseObject(person, PersonDTO.class))
+                .getContent();
+        try {
+            FileExporter exporter = this.exporter.getExporter(acceptHeader);
+            return exporter.exportFile(people);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during file export", e);
+        }
     }
 
     public PersonDTO insert(PersonDTO person) {
@@ -188,5 +209,11 @@ public class PersonService {
         dto.add(linkTo(methodOn(PersonController.class).update(dto.getId(), dto)).withRel("update").withType("PUT"));
         dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
         dto.add(linkTo(methodOn(PersonController.class).delete(dto.getId())).withRel("delete").withType("DELETE"));
+        dto.add(linkTo(methodOn(PersonController.class).exportPage(
+                1, 12, "asc", null))
+                .withRel("exportPage")
+                .withType("GET")
+                .withTitle("Export People")
+        );
     }
 }
