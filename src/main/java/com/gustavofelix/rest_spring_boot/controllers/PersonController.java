@@ -5,6 +5,7 @@ import com.gustavofelix.rest_spring_boot.dto.PersonDTO;
 import com.gustavofelix.rest_spring_boot.serialization.converter.YamlJackson2HttpMessageConverter;
 import com.gustavofelix.rest_spring_boot.service.PersonService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -14,9 +15,11 @@ import org.springframework.hateoas.PagedModel;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 //@CrossOrigin(origins = "http://localhost:8080")
 @RestController
@@ -43,6 +46,17 @@ public class PersonController implements PersonControllerDocs {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sortDirection, "firstName"));
 
         return ResponseEntity.ok().body(personService.findAll(pageable));
+    }
+
+    @PostMapping(value = "/massCreation",
+            produces = {
+                    MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.APPLICATION_XML_VALUE,
+                    YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML
+    })
+    @Override
+    public List<PersonDTO> massCreation(@RequestParam("file") MultipartFile file) {
+        return personService.massCreation(file);
     }
 
     @GetMapping(value = "/findPeopleByName/{firstName}",
