@@ -2,14 +2,19 @@ package com.gustavofelix.rest_spring_boot.service;
 
 import com.gustavofelix.rest_spring_boot.controllers.PersonController;
 import com.gustavofelix.rest_spring_boot.dto.PersonDTO;
+import com.gustavofelix.rest_spring_boot.exception.BadRequestException;
+import com.gustavofelix.rest_spring_boot.exception.FileStorageException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceBadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
+import com.gustavofelix.rest_spring_boot.file.importer.contract.FileImporter;
+import com.gustavofelix.rest_spring_boot.file.importer.factory.FileImporterFactory;
 import com.gustavofelix.rest_spring_boot.model.Person;
 import com.gustavofelix.rest_spring_boot.repository.PersonRepository;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 import org.springframework.data.domain.Page;
@@ -20,6 +25,12 @@ import org.springframework.hateoas.Link;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Optional;
 
 import static com.gustavofelix.rest_spring_boot.mapper.ObjectMapper.parseObject;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -31,6 +42,9 @@ public class PersonService {
     private PersonRepository personRepository;
 
     @Autowired
+    private FileImporterFactory importer;
+
+    @Autowired
     PagedResourcesAssembler<PersonDTO> assembler;
 
     private Logger logger = LoggerFactory.getLogger(PersonService.class.getName());
@@ -40,21 +54,7 @@ public class PersonService {
 
         var people = personRepository.findAll(pageable);
 
-        var peopleWithLinks = people.map(person -> {
-            var dto = parseObject(person, PersonDTO.class);
-            addHateoasLinks(dto);
-            return dto;
-        });
-
-        Link findAllLink = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PersonController.class)
-                        .findAll(
-                                pageable.getPageNumber(),
-                                pageable.getPageSize(),
-                                String.valueOf(pageable.getSort()))
-        ).withSelfRel();
-
-        return assembler.toModel(peopleWithLinks, findAllLink);
+        return buildPagedModel(pageable, people);
     }
 
     public PagedModel<EntityModel<PersonDTO>> findByName(String firstName, Pageable pageable) {
@@ -62,21 +62,7 @@ public class PersonService {
 
         var people = personRepository.findPeopleByName(firstName, pageable);
 
-        var peopleWithLinks = people.map(person -> {
-            var dto = parseObject(person, PersonDTO.class);
-            addHateoasLinks(dto);
-            return dto;
-        });
-
-        Link findAllLink = WebMvcLinkBuilder.linkTo(
-                WebMvcLinkBuilder.methodOn(PersonController.class)
-                        .findAll(
-                                pageable.getPageNumber(),
-                                pageable.getPageSize(),
-                                String.valueOf(pageable.getSort()))
-        ).withSelfRel();
-
-        return assembler.toModel(peopleWithLinks, findAllLink);
+        return buildPagedModel(pageable, people);
     }
 
     public PersonDTO findById(Long id) {
@@ -100,6 +86,34 @@ public class PersonService {
         var dto = parseObject(personRepository.save(entity), PersonDTO.class);
         addHateoasLinks(dto);
         return dto;
+    }
+
+    public List<PersonDTO> massCreation(MultipartFile file) {
+        logger.info("Importing people from file!");
+
+        if (file.isEmpty()) throw new BadRequestException("Please, set a Valid File");
+
+        try (InputStream inputStream = file.getInputStream()){
+            String fileName = Optional.ofNullable(file.getOriginalFilename())
+                    .orElseThrow(() -> new BadRequestException("File name cannot be null!"));
+
+            FileImporter importer = this.importer.getImporter(fileName);
+
+            List<Person> entities = importer.importFile(inputStream).stream()
+                    .map(dto -> personRepository.save(parseObject(dto, Person.class)))
+                    .toList();
+
+            return entities.stream()
+                    .map(entity -> {
+                        var dto = parseObject(entity, PersonDTO.class);
+                        addHateoasLinks(dto);
+                        return dto;
+                    })
+                    .toList();
+
+        } catch (Exception e) {
+            throw new FileStorageException("Error processing the File!");
+        }
     }
 
     public PersonDTO update(Long id, PersonDTO person) {
@@ -147,9 +161,28 @@ public class PersonService {
         entity.setGender(person.getGender());
     }
 
+    private PagedModel<EntityModel<PersonDTO>> buildPagedModel(Pageable pageable, Page<Person> people) {
+        var peopleWithLinks = people.map(person -> {
+            var dto = parseObject(person, PersonDTO.class);
+            addHateoasLinks(dto);
+            return dto;
+        });
+
+        Link findAllLink = WebMvcLinkBuilder.linkTo(
+                WebMvcLinkBuilder.methodOn(PersonController.class)
+                        .findAll(
+                                pageable.getPageNumber(),
+                                pageable.getPageSize(),
+                                String.valueOf(pageable.getSort()))
+        ).withSelfRel();
+
+        return assembler.toModel(peopleWithLinks, findAllLink);
+    }
+
     private static void addHateoasLinks(PersonDTO dto) {
         dto.add(linkTo(methodOn(PersonController.class).findById(dto.getId())).withSelfRel().withType("GET"));
         dto.add(linkTo(methodOn(PersonController.class).findAll(1, 12, "asc")).withRel("findAll").withType("GET"));
+        dto.add(linkTo(methodOn(PersonController.class).findByName("", 1, 12, "asc")).withRel("findByName").withType("GET"));
         dto.add(linkTo(methodOn(PersonController.class).insert(dto)).withRel("insert").withType("POST"));
         dto.add(linkTo(methodOn(PersonController.class).update(dto.getId(), dto)).withRel("update").withType("PUT"));
         dto.add(linkTo(methodOn(PersonController.class).disablePerson(dto.getId())).withRel("disable").withType("PATCH"));
