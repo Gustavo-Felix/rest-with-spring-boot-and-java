@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.PersonDTO;
-import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.wrappers.json.person.WrapperPersonDTO;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.dto.wrappers.xml.PagedModelPerson;
 import com.gustavofelix.rest_spring_boot.IntegrationTests.testcontainers.AbstractIntegrationTest;
 import com.gustavofelix.rest_spring_boot.config.TestConfigs;
