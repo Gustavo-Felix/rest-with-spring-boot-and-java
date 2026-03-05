@@ -1,10 +1,14 @@
 package com.gustavofelix.rest_spring_boot.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.gustavofelix.rest_spring_boot.model.Book;
+import jakarta.persistence.*;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 @Relation(collectionRelation = "people")
@@ -16,6 +20,12 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
     private String address;
     private String gender;
     private Boolean enabled;
+
+    private String profileUrl;
+    private String photoUrl;
+
+    @JsonIgnore
+    private List<Book> books;
 
     public PersonDTO() {
     }
@@ -68,6 +78,31 @@ public class PersonDTO extends RepresentationModel<PersonDTO> implements Seriali
         this.enabled = enabled;
     }
 
+    public String getProfileUrl() {
+        return profileUrl;
+    }
+
+    public void setProfileUrl(String profileUrl) {
+        this.profileUrl = profileUrl;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
+
+    @JsonIgnore
     public String getName() {
         return (firstName != null ? firstName : "") + " " + (lastName != null ? lastName : "");
     }
