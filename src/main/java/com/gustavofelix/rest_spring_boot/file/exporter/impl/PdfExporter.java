@@ -18,7 +18,7 @@ import java.util.Map;
 public class PdfExporter implements FileExporter {
     @Override
     public Resource exportFile(List<PersonDTO> people) throws Exception {
-        InputStream inputStream = getClass().getResourceAsStream("/templates/people.jrxml");
+        InputStream inputStream = getClass().getResourceAsStream("/templates/person.jrxml");
         if (inputStream == null) {
             throw new RuntimeException("Template not found: /templates/people.jrxml");
         }
