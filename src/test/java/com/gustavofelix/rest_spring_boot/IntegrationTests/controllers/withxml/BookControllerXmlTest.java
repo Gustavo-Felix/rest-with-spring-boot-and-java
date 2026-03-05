@@ -186,17 +186,17 @@ class BookControllerXmlTest extends AbstractIntegrationTest {
         assertNotNull(bookOne.getId());
         assertTrue(bookOne.getId() > 0);
 
-        assertEquals("Crockford", bookOne.getAuthor());
-        assertEquals("JavaScript", bookOne.getTitle());
-        assertEquals(Instant.parse("2017-11-07T15:09:01.674Z"), bookOne.getLaunchDate());
-        assertEquals(67.00, bookOne.getPrice());
+        assertEquals("Mike Cohn", bookOne.getAuthor());
+        assertEquals("Agile Estimating and Planning", bookOne.getTitle());
+        assertEquals(Instant.parse("2012-04-03T00:00:00Z"), bookOne.getLaunchDate());
+        assertEquals(92.51, bookOne.getPrice());
 
         assertNotNull(bookTwo.getId());
         assertTrue(bookTwo.getId() > 0);
 
-        assertEquals("Susan Cain", bookTwo.getAuthor());
-        assertEquals("O poder dos quietos", bookTwo.getTitle());
-        assertEquals(Instant.parse("2017-11-07T15:09:01.674Z"), bookTwo.getLaunchDate());
-        assertEquals(123.00, bookTwo.getPrice());
+        assertEquals("Mike Cohn", bookTwo.getAuthor());
+        assertEquals("Agile Estimating and Planning", bookTwo.getTitle());
+        assertEquals(Instant.parse("2011-10-11T00:00:00Z"), bookTwo.getLaunchDate());
+        assertEquals(87.41, bookTwo.getPrice());
     }
 }

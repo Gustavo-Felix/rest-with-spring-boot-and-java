@@ -195,19 +195,17 @@ class BookControllerYamlTest extends AbstractIntegrationTest {
         assertNotNull(bookOne.getId());
         assertTrue(bookOne.getId() > 0);
 
-        assertEquals("Richard Hunter e George Westerman", bookOne.getAuthor());
-        assertEquals("O verdadeiro valor de TI", bookOne.getTitle());
-        assertEquals(Instant.parse("2017-11-07T15:09:01.674Z"), bookOne.getLaunchDate());
-        assertEquals(95.0, bookOne.getPrice());
+        assertEquals("Mike Cohn", bookOne.getAuthor());
+        assertEquals("Agile Estimating and Planning", bookOne.getTitle());
+        assertEquals(Instant.parse("2011-12-09T00:00:00Z"), bookOne.getLaunchDate());
+        assertEquals(112.87, bookOne.getPrice());
 
         assertNotNull(bookTwo.getId());
         assertTrue(bookTwo.getId() > 0);
 
-        assertEquals("Marc J. Schiller", bookTwo.getAuthor());
-        assertEquals("Os 11 segredos de líderes de TI altamente influentes", bookTwo.getTitle());
-        assertEquals(Instant.parse("2017-11-07T15:09:01.674Z"), bookTwo.getLaunchDate());
-        assertEquals(45.0, bookTwo.getPrice());
-
-
+        assertEquals("Mike Cohn", bookTwo.getAuthor());
+        assertEquals("Agile Estimating and Planning", bookTwo.getTitle());
+        assertEquals(Instant.parse("2012-04-03T00:00:00Z"), bookTwo.getLaunchDate());
+        assertEquals(92.51, bookTwo.getPrice());
     }
 }
