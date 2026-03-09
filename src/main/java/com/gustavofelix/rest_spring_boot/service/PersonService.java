@@ -6,8 +6,7 @@ import com.gustavofelix.rest_spring_boot.exception.BadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.FileStorageException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceBadRequestException;
 import com.gustavofelix.rest_spring_boot.exception.ResourceNotFoundException;
-import com.gustavofelix.rest_spring_boot.file.exporter.MediaTypes;
-import com.gustavofelix.rest_spring_boot.file.exporter.contract.FileExporter;
+import com.gustavofelix.rest_spring_boot.file.exporter.contract.PersonExporter;
 import com.gustavofelix.rest_spring_boot.file.exporter.factory.FileExporterFactory;
 import com.gustavofelix.rest_spring_boot.file.importer.contract.FileImporter;
 import com.gustavofelix.rest_spring_boot.file.importer.factory.FileImporterFactory;
@@ -31,7 +30,6 @@ import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
@@ -84,16 +82,33 @@ public class PersonService {
     }
 
     public Resource exportPage(Pageable pageable, String acceptHeader) {
-        logger.info("Exporting a Person Page!");
+
+        logger.info("Exporting a People page!");
 
         var people = personRepository.findAll(pageable)
                 .map(person -> parseObject(person, PersonDTO.class))
                 .getContent();
+
         try {
-            FileExporter exporter = this.exporter.getExporter(acceptHeader);
-            return exporter.exportFile(people);
+            PersonExporter exporter = this.exporter.getExporter(acceptHeader);
+            return exporter.exportPeople(people);
         } catch (Exception e) {
-            throw new RuntimeException("Error during file export", e);
+            throw new RuntimeException("Error during file export!", e);
+        }
+    }
+
+    public Resource exportPerson(Long id, String acceptHeader) {
+        logger.info("Exporting data of one Person!");
+
+        var person = personRepository.findById(id)
+                .map(entity -> parseObject(entity, PersonDTO.class))
+                .orElseThrow(() -> new ResourceNotFoundException("No records found for this ID!"));
+
+        try {
+            PersonExporter exporter = this.exporter.getExporter(acceptHeader);
+            return exporter.exportPerson(person);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during file export!", e);
         }
     }
 
@@ -214,6 +229,12 @@ public class PersonService {
                 .withRel("exportPage")
                 .withType("GET")
                 .withTitle("Export People")
+        );
+        dto.add(linkTo(methodOn(PersonController.class).export(
+                dto.getId(), null))
+                .withRel("exportPerson")
+                .withType("GET")
+                .withTitle("Export Person")
         );
     }
 }

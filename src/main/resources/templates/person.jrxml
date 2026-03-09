@@ -5,7 +5,7 @@
 	<parameter name="PERSON_ID" class="java.lang.Long"/>
 	<parameter name="SUB_REPORT_DATA_SOURCE" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="QR_CODEIMAGE" class="java.io.InputStream"/>
-	<parameter name="SUB_REPORT_DIR" class="java.lang.String"/>
+	<parameter name="SUB_REPORT_DIR" class="net.sf.jasperreports.engine.JasperReport"/>
 	<query language="SQL"><![CDATA[SELECT id,
 	CONCAT(first_name, ' ', last_name) AS name,
 	address,
