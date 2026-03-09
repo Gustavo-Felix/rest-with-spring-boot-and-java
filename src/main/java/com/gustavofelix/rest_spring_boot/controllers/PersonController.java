@@ -28,7 +28,7 @@ import java.util.Map;
 
 //@CrossOrigin(origins = "http://localhost:8080")
 @RestController
-@RequestMapping(value = "api/person/v1")
+@RequestMapping(value = "/api/person/v1")
 @Tag(name = "People", description = "EndPoints for managing people!")
 public class PersonController implements PersonControllerDocs {
 

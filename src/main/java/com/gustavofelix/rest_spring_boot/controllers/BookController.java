@@ -18,7 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 
 @RestController
-@RequestMapping(value = "api/book/v1")
+@RequestMapping(value = "/api/book/v1")
 public class BookController implements BookControllerDocs {
     
     @Autowired
