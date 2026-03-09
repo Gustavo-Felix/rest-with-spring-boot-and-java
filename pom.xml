@@ -34,6 +34,7 @@
 		<apache.poi.version>5.5.1</apache.poi.version>
 		<commons-csv.version>1.14.1</commons-csv.version>
 		<jasper.version>7.0.3</jasper.version>
+		<zxing.version>3.5.4</zxing.version>
 	</properties>
 	<dependencies>
 
@@ -84,6 +85,18 @@
 			<groupId>net.sf.jasperreports</groupId>
 			<artifactId>jasperreports</artifactId>
 			<version>${jasper.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>${zxing.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>${zxing.version}</version>
 		</dependency>
 
 		<dependency>
