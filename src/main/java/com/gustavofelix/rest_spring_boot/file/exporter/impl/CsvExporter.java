@@ -1,7 +1,7 @@
 package com.gustavofelix.rest_spring_boot.file.exporter.impl;
 
 import com.gustavofelix.rest_spring_boot.dto.PersonDTO;
-import com.gustavofelix.rest_spring_boot.file.exporter.contract.FileExporter;
+import com.gustavofelix.rest_spring_boot.file.exporter.contract.PersonExporter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.core.io.ByteArrayResource;
@@ -14,26 +14,19 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
-public class CsvExporter implements FileExporter {
+public class CsvExporter implements PersonExporter {
     @Override
-    public Resource exportFile(List<PersonDTO> people) throws Exception {
+    public Resource exportPeople(List<PersonDTO> people) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
 
         CSVFormat csvFormat = CSVFormat.Builder.create()
-                .setHeader(
-                        "ID",
-                        "First Name",
-                        "Last Name",
-                        "Address",
-                        "Gender",
-                        "Enabled"
-                )
+                .setHeader("ID", "First Name", "Last Name", "Address", "Gender", "Enabled")
                 .setSkipHeaderRecord(false)
                 .build();
 
         try (CSVPrinter csvPrinter = new CSVPrinter(writer, csvFormat)){
-            for (PersonDTO person : people) {
+            for(PersonDTO person : people) {
                 csvPrinter.printRecord(
                         person.getId(),
                         person.getFirstName(),
@@ -43,7 +36,14 @@ public class CsvExporter implements FileExporter {
                         person.getEnabled()
                 );
             }
+
         }
         return new ByteArrayResource(outputStream.toByteArray());
     }
+
+    @Override
+    public Resource exportPerson(PersonDTO person) throws Exception {
+        return null;
+    }
+
 }

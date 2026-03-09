@@ -1,7 +1,7 @@
 package com.gustavofelix.rest_spring_boot.file.exporter.factory;
 
 import com.gustavofelix.rest_spring_boot.file.exporter.MediaTypes;
-import com.gustavofelix.rest_spring_boot.file.exporter.contract.FileExporter;
+import com.gustavofelix.rest_spring_boot.file.exporter.contract.PersonExporter;
 import com.gustavofelix.rest_spring_boot.file.exporter.impl.CsvExporter;
 import com.gustavofelix.rest_spring_boot.file.exporter.impl.PdfExporter;
 import com.gustavofelix.rest_spring_boot.file.exporter.impl.XlsxExporter;
@@ -22,7 +22,7 @@ public class FileExporterFactory {
     @Autowired
     private ApplicationContext context;
 
-    public FileExporter getExporter(String acceptHeader) throws Exception {
+    public PersonExporter getExporter(String acceptHeader) throws Exception {
         if (acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_XLSX_VALUE)) {
             return context.getBean(XlsxExporter.class);
         } else if (acceptHeader.equalsIgnoreCase(MediaTypes.APPLICATION_CSV_VALUE)) {
