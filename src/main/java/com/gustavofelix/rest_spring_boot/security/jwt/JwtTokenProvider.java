@@ -88,11 +88,12 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
-        if(StringUtils.isEmpty(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring("Bearer ".length());
-        } else {
-            throw new InvalidJWTAuthenticationException("Invalid JWT Token!");
-        }
+        if(refreshTokenContainsBearer(bearerToken)) return bearerToken.substring("Bearer ".length());
+        return null;
+    }
+
+    private static boolean refreshTokenContainsBearer(String refreshToken) {
+        return StringUtils.isNotBlank(refreshToken) && refreshToken.startsWith("Bearer ");
     }
 
     public boolean validateToken(String token) {
