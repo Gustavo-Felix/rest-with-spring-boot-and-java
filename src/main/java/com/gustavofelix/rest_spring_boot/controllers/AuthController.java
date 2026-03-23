@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,7 +28,7 @@ public class AuthController {
 
     @Operation(summary = "Sign in with username and password!", description = "Returns a token to be used in other requests!")
     @PostMapping(value = "/signin")
-    public ResponseEntity<?> signIn(AccountCredentialsDTO credentials) {
+    public ResponseEntity<?> signIn(@RequestBody AccountCredentialsDTO credentials) {
         if (checkCredentials(credentials)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
 
         var token = authService.signIn(credentials);
