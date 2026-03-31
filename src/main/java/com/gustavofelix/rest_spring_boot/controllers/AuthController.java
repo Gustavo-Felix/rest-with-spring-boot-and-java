@@ -10,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -37,6 +34,22 @@ public class AuthController {
 
 
         return ResponseEntity.ok().body(token);
+    }
+
+    @Operation(summary = "Refresh token with username and refresh token!", description = "Returns a token to be used in other requests!")
+    @PutMapping(value = "/refresh/{username}")
+    public ResponseEntity<?> refresh(@PathVariable("username") String username, @RequestHeader("Authorization") String refreshtoken) {
+        if (parametersAreInvalid(username, refreshtoken)) return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid client request!");
+
+        var token = authService.refreshToken(username, refreshtoken);
+
+        if (token == null) return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid client request!");
+
+        return ResponseEntity.ok().body(token);
+    }
+
+    private boolean parametersAreInvalid(String username, String refreshtoken) {
+        return StringUtils.isBlank(username) || StringUtils.isBlank(refreshtoken);
     }
 
     private boolean checkCredentials(AccountCredentialsDTO credentials) {
