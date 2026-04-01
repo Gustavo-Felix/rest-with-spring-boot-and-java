@@ -7,8 +7,15 @@ public class AccountCredentialsDTO implements Serializable {
 
     private String username;
     private String password;
+    private String fullname;
 
     public AccountCredentialsDTO() {
+    }
+
+    public AccountCredentialsDTO(String username, String password, String fullname) {
+        this.username = username;
+        this.password = password;
+        this.fullname = fullname;
     }
 
     public String getUsername() {
@@ -25,6 +32,14 @@ public class AccountCredentialsDTO implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public String getFullname() {
+        return fullname;
+    }
+
+    public void setFullname(String fullname) {
+        this.fullname = fullname;
     }
 
     @Override

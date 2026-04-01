@@ -66,6 +66,7 @@ public class SecurityConfig {
                         authorizeHttpRequests -> authorizeHttpRequests
                     .requestMatchers(
                 "/auth/signin",
+                        "/auth/signup",
                         "/auth/refresh/**",
                         "/swagger-ui/**",
                         "/v3/api-docs/**"

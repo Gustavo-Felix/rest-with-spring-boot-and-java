@@ -1,13 +1,16 @@
 package com.gustavofelix.rest_spring_boot.controllers;
 
+import com.gustavofelix.rest_spring_boot.dto.PersonDTO;
 import com.gustavofelix.rest_spring_boot.dto.security.AccountCredentialsDTO;
 import com.gustavofelix.rest_spring_boot.dto.security.TokenDTO;
+import com.gustavofelix.rest_spring_boot.serialization.converter.YamlJackson2HttpMessageConverter;
 import com.gustavofelix.rest_spring_boot.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
@@ -56,5 +59,27 @@ public class AuthController {
         return credentials == null ||
                 StringUtils.isBlank(credentials.getUsername()) ||
                 StringUtils.isBlank(credentials.getPassword());
+    }
+
+    @PostMapping(value = "/signup",
+            consumes = {
+                MediaType.APPLICATION_JSON_VALUE,
+                MediaType.APPLICATION_XML_VALUE,
+                YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML},
+            produces = {
+                    MediaType.APPLICATION_JSON_VALUE,
+                    MediaType.APPLICATION_XML_VALUE,
+                    YamlJackson2HttpMessageConverter.MEDIA_TYPE_YAML
+            })
+    public ResponseEntity<AccountCredentialsDTO> insert(@RequestBody AccountCredentialsDTO user) {
+        AccountCredentialsDTO createdUser = authService.insert(user);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{username}")
+                .buildAndExpand(createdUser.getUsername())
+                .toUri();
+
+        return ResponseEntity.created(location).body(createdUser);
     }
 }
